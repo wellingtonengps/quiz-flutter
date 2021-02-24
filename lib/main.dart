@@ -1,69 +1,73 @@
 import 'package:flutter/material.dart';
-import 'package:quiz/questao.dart';
-import 'package:quiz/resposta.dart';
+import 'package:quiz/questionario.dart';
+import 'package:quiz/resultado.dart';
 
 main() => runApp(PerguntaApp());
 
 class _PerguntaAppState extends State<PerguntaApp> {
-  void respoder() {
-    setState(() {
-      perguntaSelecionada++;
-    });
-    print(perguntaSelecionada);
+  var perguntaSelecionada = 0;
+
+  var pontuacaoTotal = 0;
+
+  final perguntas = const [
+    {
+      'texto': 'Qual é a cor favorita?',
+      'respostas': [
+        {'texto': 'Vermelho', 'pontuação': 5},
+        {'texto': 'Preto', 'pontuação': 10},
+        {'texto': 'Verde', 'pontuação': 5},
+        {'texto': 'Amarelo', 'pontuação': 5},
+      ],
+    },
+    {
+      'texto': 'Qual é o animal favorito?',
+      'respostas': [
+        {'texto': 'Cachorro', 'pontuação': 5},
+        {'texto': 'Gato', 'pontuação': 10},
+        {'texto': 'Papagaio', 'pontuação': 5},
+        {'texto': 'Águia', 'pontuação': 10},
+      ],
+    },
+    {
+      'texto': 'Qual é a músiva favorito?',
+      'respostas': [
+        {'texto': 'Slow Dancing in Dark', 'pontuação': 5},
+        {'texto': 'Phograph', 'pontuação': 10},
+        {'texto': 'all of me', 'pontuação': 5},
+        {'texto': 'Monster', 'pontuação': 10},
+      ],
+    },
+  ];
+
+  void responder(int pontuacao) {
+    if (temPerguntasSelecionadas) {
+      setState(() {
+        perguntaSelecionada++;
+        pontuacaoTotal += pontuacao;
+      });
+    }
+    print(pontuacaoTotal);
   }
 
-  var perguntaSelecionada = 0;
+  bool get temPerguntasSelecionadas {
+    return perguntaSelecionada < perguntas.length;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, Object>> perguntas = [
-      {
-        'texto': 'Qual é a cor favorita?',
-        'respostas': [
-          'Preto',
-          'Vermelho',
-          'Verde',
-          'Amarelo',
-        ],
-      },
-      {
-        'texto': 'Qual é o animal favorito?',
-        'respostas': [
-          'Cachorro',
-          'Gato',
-          'Papagaio',
-          'Águia',
-        ],
-      },
-      {
-        'texto': 'Qual é a músiva favorito?',
-        'respostas': [
-          'Slow Dancing in Dark',
-          'Phograph',
-          'all of me',
-          'Monster',
-        ],
-      },
-    ];
-
-    List<Widget> respostas = [];
-
-    for (String textoResp in perguntas[perguntaSelecionada]['respostas']) {
-      respostas.add(Resposta(textoResp, respoder));
-    }
-
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
           centerTitle: true,
           title: Text('Sobre Wellington Responda'),
         ),
-        body: Column(
-          children: [
-            Questao(perguntas[perguntaSelecionada]['texto']),
-            ...respostas,
-          ],
-        ),
+        body: temPerguntasSelecionadas
+            ? Questionario(
+                perguntaSelecionada: perguntaSelecionada,
+                perguntas: perguntas,
+                quandoResponder: responder,
+              )
+            : Resultado(pontuacaoTotal: pontuacaoTotal),
       ),
     );
   }
